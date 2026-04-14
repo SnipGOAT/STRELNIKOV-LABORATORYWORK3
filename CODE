@@ -1,0 +1,111 @@
+"""15. Итераторы и генераторы
+1) Реализуйте класс-итератор для последовательности Фибоначчи с заданным максимальным значением.
+2) Реализуйте генератор для последовательности простых чисел до заданного границы.
+3) Реализуйте класс-контейнер для коллекции книг, который поддерживает перебор (итерацию) по своим элементам."""
+
+# Класс-итератор для последовательности Фибоначчи
+class FibonacciIterator:
+    """Класс-итератор для генерации чисел Фибоначчи.
+    Останавливается, когда следующее число превышает max_value."""
+    def __init__(self, max_value):
+        self.max_value = max_value
+        self.a, self.b = 0, 1  # Начальные значения последовательности
+
+    def __iter__(self):
+        """Возвращает сам объект итератора."""
+        return self
+
+    def __next__(self):
+        """Вычисляет следующее число Фибоначчи."""
+        if self.a > self.max_value:
+            raise StopIteration  # Останавливаем итерацию
+
+        current = self.a
+        self.a, self.b = self.b, self.a + self.b  # Переход к следующему числу
+        return current
+
+
+# Генератор для последовательности простых чисел
+def is_prime(n):
+    """Вспомогательная функция для проверки числа на простоту."""
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    # Проверяем делители до квадратного корня из n
+    for i in range(3, int(n ** 0.5) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+
+def prime_generator(limit):
+    """Генератор, который выдаёт простые числа до заданного предела.
+    Использует yield для ленивой генерации значений."""
+    for num in range(2, limit + 1):
+        if is_prime(num):
+            yield num
+
+
+# Класс-контейнер для коллекции книг
+class Book:
+    """Класс, представляющий отдельную книгу."""
+    def __init__(self, title, author):
+        self.title = title
+        self.author = author
+
+    def __str__(self):
+        """Строковое представление книги."""
+        return f"'{self.title}' (автор: {self.author})"
+
+
+class BookCollection:
+    """Класс-контейнер для хранения коллекции книг.
+    Поддерживает итерацию по своим элементам."""
+    def __init__(self):
+        self.books = []  # Внутренний список для хранения книг
+
+    def add_book(self, book):
+        """Добавляет книгу в коллекцию."""
+        self.books.append(book)
+
+    def __iter__(self):
+        """
+        Возвращает итератор по списку книг.
+        Это позволяет использовать коллекцию в цикле for.
+        """
+        return iter(self.books)
+
+    def __len__(self):
+        """Возвращает количество книг в коллекции."""
+        return len(self.books)
+
+
+# Демонстрация
+if __name__ == "__main__":
+    # Демонстрация итератора для Фибоначчи
+    print("\n1. Последовательность Фибоначчи (до 100):")
+    fib_iterator = FibonacciIterator(100)
+    fib_sequence = list(fib_iterator)
+    print(f"   Результат: {fib_sequence}")
+    print(f"   Количество чисел: {len(fib_sequence)}")
+
+    # Демонстрация генератора для простых чисел
+    print("\n2. Простые числа (до 50):")
+    primes = list(prime_generator(50))
+    print(f"   Результат: {primes}")
+    print(f"   Количество простых чисел: {len(primes)}")
+
+    # Демонстрация контейнера для коллекции книг
+    print("\n3. Коллекция книг (перебор в цикле):")
+    library = BookCollection()
+    library.add_book(Book("Интенсивный курс Python", "Эрик Маттес"))
+    library.add_book(Book("Искусственный интеллект: современный подход", "Стюарт Рассел, Питер Норвиг"))
+    library.add_book(Book("Граф Монте-Кристо", "Александр Дюма"))
+
+    print(f"   Всего книг в коллекции: {len(library)}")
+    print("   Список книг:")
+    for i, book in enumerate(library, 1):
+        print(f"      {i}. {book}")
